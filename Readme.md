@@ -38,6 +38,7 @@ Authorization: Bearer <your-jwt-token>
 - Use the `/generateToken.php` endpoint (or equivalent) to get a JWT for valid users.
 - The token will be required for every request.
 
+```
 URL: http://localhost/generateToken.php
 Method: POST
 
@@ -46,6 +47,14 @@ Request Payload:
 {
     "user_id": 1
 }
+
+Response:
+
+{
+    "status": "success",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhbHVtbmlfbG9jYXRvciIsImlhdCI6MTczNDMzNzY4NSwiZXhwIjoxNzM0MzQxMjg1LCJ1c2VyX2lkIjoxfQ.gw5TIgeQZ7T_PV4Mld31c9YB9a8AFJKSH7jfSJQ6wDw"
+}
+```
 
 ![Alumni Locator Screenshot](images/generateToken.png)
 
@@ -66,32 +75,47 @@ GET /getNearbyAlumni.php
 
 ### Example Request:
 ```
-GET /getNearbyAlumni.php?user_id=123&radius=20
+GET /getNearbyAlumni.php?user_id=1&radius=2
 Authorization: Bearer <your-jwt-token>
 ```
 
 ### Example Response:
 ```json
 {
-  "status": "success",
-  "data": [
-    {
-      "id": 456,
-      "name": "John Doe",
-      "email": "john.doe@example.com",
-      "location": "POINT(10.12345 20.12345)",
-      "distance": 5.5
-    },
-    {
-      "id": 789,
-      "name": "Jane Doe",
-      "email": "jane.doe@example.com",
-      "location": "POINT(11.54321 20.56789)",
-      "distance": 7.0
+    "status": "success",
+    "data": [
+        {
+            "id": 2,
+            "name": "Bob White",
+            "email": "bob.white@example.com",
+            "location": "POINT(37.7849 -122.4194)",
+            "distance": 0.596785048070618
+        },
+        {
+            "id": 4,
+            "name": "Diana Blue",
+            "email": "diana.blue@example.com",
+            "location": "POINT(37.7649 -122.4194)",
+            "distance": 0.596785048070618
+        },
+        {
+            "id": 5,
+            "name": "Eve Brown",
+            "email": "eve.brown@example.com",
+            "location": "POINT(37.7649 -122.4094)",
+            "distance": 1.2630139282833803
+        }
+    ],
+    "pagination": {
+        "total_records": 3,
+        "total_pages": 1,
+        "current_page": 1,
+        "limit": 10
     }
-  ]
 }
 ```
+
+![Alumni Locator Screenshot](images/getNearbyAlumni.png)
 
 ---
 
@@ -107,11 +131,11 @@ PUT /updateUser.php
 ### Request Body (JSON):
 ```json
 {
-  "id": 123,
-  "name": "John Doe",
-  "email": "john.doe@example.com",
-  "latitude": 10.12345,
-  "longitude": 20.12345
+    "id": 1,
+    "name": "Alice Green",
+    "email": "alice.green1@example.com",
+    "latitude": "37.7749",
+    "longitude": "-122.4194"
 }
 ```
 
@@ -124,16 +148,18 @@ Authorization: Bearer <your-jwt-token>
 ### Example Response:
 ```json
 {
-  "status": "success",
-  "message": "User updated successfully"
+    "status": "success",
+    "message": "User updated successfully"
 }
 ```
+
+![Alumni Locator Screenshot](images/updateUser.png)
 
 ---
 
 ## Rate Limiting
 
-Rate limiting can be implemented for these APIs to prevent abuse and ensure fair usage. You can set the number of requests allowed per minute/hour, and any requests exceeding this limit will be rejected with a 429 status code (Too Many Requests).
+Rate limiting is implemented for these APIs to prevent abuse and ensure fair usage. You can set the number of requests allowed per minute/hour, and any requests exceeding this limit will be rejected with a 429 status code (Too Many Requests).
 
 ---
 
