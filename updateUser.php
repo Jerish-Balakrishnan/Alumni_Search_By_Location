@@ -32,10 +32,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 	// Validate the token
 	$userId = validateToken($token);
 	if (!$userId) {
-        http_response_code(401); // Unauthorized
-        echo json_encode(['status' => 'error', 'message' => 'Invalid or expired token']);
-        exit;
-    }
+		http_response_code(401); // Unauthorized
+		echo json_encode(['status' => 'error', 'message' => 'Invalid or expired token']);
+		exit;
+	}
 
 	// Get the raw PUT data
 	$data = json_decode(file_get_contents("php://input"), true);
@@ -54,24 +54,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 	}
 
 	// Validate email
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        http_response_code(400); // Bad Request
-        echo json_encode(['status' => 'error', 'message' => 'Invalid email format']);
-        exit;
-    }
+	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+		http_response_code(400); // Bad Request
+		echo json_encode(['status' => 'error', 'message' => 'Invalid email format']);
+		exit;
+	}
 
-    // Validate latitude and longitude
-    if (!is_numeric($latitude) || $latitude < -90 || $latitude > 90) {
-        http_response_code(400); // Bad Request
-        echo json_encode(['status' => 'error', 'message' => 'Invalid latitude. Must be a number between -90 and 90.']);
-        exit;
-    }
+	// Validate latitude and longitude
+	if (!is_numeric($latitude) || $latitude < -90 || $latitude > 90) {
+		http_response_code(400); // Bad Request
+		echo json_encode(['status' => 'error', 'message' => 'Invalid latitude. Must be a number between -90 and 90.']);
+		exit;
+	}
 
-    if (!is_numeric($longitude) || $longitude < -180 || $longitude > 180) {
-        http_response_code(400); // Bad Request
-        echo json_encode(['status' => 'error', 'message' => 'Invalid longitude. Must be a number between -180 and 180.']);
-        exit;
-    }
+	if (!is_numeric($longitude) || $longitude < -180 || $longitude > 180) {
+		http_response_code(400); // Bad Request
+		echo json_encode(['status' => 'error', 'message' => 'Invalid longitude. Must be a number between -180 and 180.']);
+		exit;
+	}
 
 	// Ensure the user can only update their own details
 	if ($id != $userId) {
