@@ -17,6 +17,28 @@ This repository contains two key APIs for managing user profiles and retrieving 
 
 ---
 
+## Key Features
+
+- **JWT Authentication**:
+  - Secure access to the API using JSON Web Tokens (JWT). Each request requires a valid token in the `Authorization` header.
+  
+- **Rate Limiting**:
+  - Prevents abuse by limiting the number of API requests a client can make in a given time period.
+  
+- **Pagination**:
+  - Supports pagination to fetch results in chunks. This improves performance and provides a better user experience for large datasets.
+
+- **Spatial Index for Geolocation**:
+  - Efficiently queries nearby alumni using geospatial data stored in a `POINT` column with a spatial index.
+  
+- **Haversine Formula**:
+  - Calculates distances between geospatial points to identify alumni within a given radius.
+  
+- **Validation and Error Handling**:
+  - Comprehensive input validation and user-friendly error messages for invalid requests.
+
+---
+
 ## API Overview
 
 This API allows users to:
