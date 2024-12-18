@@ -42,8 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	$page = $_GET['page'] ?? 1; // Default page is 1
 	$limit = $_GET['limit'] ?? 10; // Default limit is 10 records
 
+	
+
 	if (!$user_id) {
-		http_response_code(400); // Bad Request
+		// Set HTTP response code to 400 (Bad Request)
+		http_response_code(400);
 		echo json_encode(['status' => 'error', 'message' => 'User ID is required']);
 		exit;
 	}
@@ -59,24 +62,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	$db->where('id', $user_id);
 	$user = $db->getOne('users', ['location']);
 	if (!$user) {
+		// Set HTTP response code to 404 (Not Found)
+		// http_response_code(404);
 		http_response_code(200); // Changed to 200 based on feedback
 		echo json_encode(['status' => 'error', 'message' => 'User not found']);
 		exit;
 	}
 
-	// Extract latitude and longitude from the POINT data type
+	// Extract latitude and longitude from the POINT data type using ST_X() and ST_Y()
 	$latLng = $user['location'];
-	$lat = $db->rawQueryValue("SELECT ST_Y(?) AS lat", [$latLng]);
-	$lng = $db->rawQueryValue("SELECT ST_X(?) AS lng", [$latLng]);
-
-	if ($lat === null || $lng === null) {
-		http_response_code(200); // Changed to 200 based on feedback
-		echo json_encode(['status' => 'error', 'message' => 'Invalid user location']);
-		exit;
-	}
-
-	$lat = $lat[0];
-	$lng = $lng[0];
+	$lat = (float) $db->rawQuery("SELECT ST_Y(?) AS lat", [$latLng])[0]['lat']; // Get latitude
+	$lng = (float) $db->rawQuery("SELECT ST_X(?) AS lng", [$latLng])[0]['lng']; // Get longitude
 
 	// Calculate OFFSET for pagination
 	$offset = ($page - 1) * $limit;
@@ -97,12 +93,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 		LIMIT ? OFFSET ?
 	";
 
-	$bindings = [$lat, $lng, $lat, $user_id, $radius, $limit, $offset];
+	// $query = "
+	// 	SELECT 
+	// 		u.id, 
+	// 		u.name, 
+	// 		u.email, 
+	// 		ST_AsText(u.location) AS location, 
+	// 		an.name AS alumni_network,
+	// 		(6378 * acos(
+	// 			cos(radians(?)) * cos(radians(ST_Y(u.location))) * 
+	// 			cos(radians(ST_X(u.location)) - radians(?)) + 
+	// 			sin(radians(?)) * sin(radians(ST_Y(u.location)))
+	// 		)) AS distance
+	// 	FROM users u
+	// 	LEFT JOIN user_alumni_networks uan ON u.id = uan.user_id
+	// 	LEFT JOIN alumni_networks an ON uan.network_id = an.id
+	// 	WHERE u.id != ? 
+	// 	HAVING distance <= ? 
+	// 	ORDER BY distance ASC
+	//  LIMIT ? OFFSET ?
+	// ";
 
 	// Execute query to find nearby alumni
-	$nearbyAlumni = $db->rawQuery($query, $bindings);
+	$nearbyAlumni = $db->rawQuery($query, [$lat, $lng, $lat, $user_id, $radius, (int) $limit, (int) $offset]);
 
 	if (empty($nearbyAlumni)) {
+		// Set HTTP response code to 404 (Not Found) if no nearby alumni are found
+		// http_response_code(404);
 		http_response_code(200); // Changed to 200 based on feedback
 		echo json_encode(['status' => 'error', 'message' => 'No nearby alumni found']);
 		exit;
@@ -123,10 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 			HAVING distance <= ?
 		) AS subquery
 	";
-
-	$totalQueryBindings = [$lat, $lng, $lat, $user_id, $radius];
-
-	$totalRecords = $db->rawQuery($totalQuery, $totalQueryBindings)[0]['total'];
+	$totalRecords = $db->rawQuery($totalQuery, [$lat, $lng, $lat, $user_id, $radius])[0]['total'];
 
 	// Calculate total pages
 	$totalPages = ceil($totalRecords / $limit);

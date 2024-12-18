@@ -1,2 +1,3 @@
+composer require thingengineer/mysqli-database-class:dev-master
 composer require firebase/php-jwt
 composer require predis/predis
