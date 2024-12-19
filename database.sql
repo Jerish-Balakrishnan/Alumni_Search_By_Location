@@ -11,6 +11,20 @@ CREATE TABLE users (
     SPATIAL INDEX(location)
 );
 
+-- Modified users table
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    location POINT NOT NULL,
+    latitude DOUBLE NOT NULL, -- Latitude column
+    longitude DOUBLE NOT NULL, -- Longitude column
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    SPATIAL INDEX(location),
+    INDEX lat_lon_index (latitude, longitude)  -- Index on the latitude and longitude columns
+);
+
 CREATE TABLE alumni_networks (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
